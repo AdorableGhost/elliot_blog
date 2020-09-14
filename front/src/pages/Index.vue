@@ -5,7 +5,22 @@
         <article_index></article_index>
         <right></right>
       </div>
+
     </q-page-container>
+    <!--    分页 -->
+    <div class="text-blue-grey-7 col-sm-12 col-xs-12 q-pa-md flex flex-bottom" id="paginator">
+
+      <div class="q-pa-lg flex flex-bottom flex-left">
+        <q-pagination
+          v-model="current"
+          color="purple"
+          :max="10"
+          :max-pages="6"
+          :boundary-numbers="true"
+        >
+        </q-pagination>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -22,6 +37,11 @@
       'right': right
     },
     setup() {
+    },
+    data() {
+      return {
+        current: 6
+      };
     }
   });
 </script>
