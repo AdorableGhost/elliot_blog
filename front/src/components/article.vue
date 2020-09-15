@@ -26,7 +26,7 @@
           <q-item clickable v-ripple class="q-pa-sm col-3">
             <q-item-section side>
               <q-avatar size="48px">
-                <img src="https://cdn.quasar.dev/img/avatar.png"/>
+                <img src="../../public/icons/favicon-128x128.png"/>
                 <!--                  <q-badge floating color="teal">new</q-badge>-->
               </q-avatar>
             </q-item-section>

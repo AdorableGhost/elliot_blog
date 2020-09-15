@@ -3,12 +3,15 @@
     <div class="">
       <div class="bg-cyan text-white">
         <q-toolbar>
-          <q-btn flat round dense icon="assignment_ind"/>
-
-          <q-toolbar-title>Quasar</q-toolbar-title>
+          <!--          <q-btn flat round dense icon="assignment_ind"/>-->
+          <q-btn dense flat round>
+            <q-img src="../../public/icons/favicon-128x128.png" style="width: 40px;height: 40px"></q-img>
+          </q-btn>
+          <q-toolbar-title>魔鬼精灵</q-toolbar-title>
 
           <q-breadcrumbs active-color="white" style="font-size: 16px">
             <q-breadcrumbs-el label="Home" icon="home"/>
+
             <q-breadcrumbs-el label="Components" icon="widgets"/>
             <q-breadcrumbs-el label="Toolbar"/>
           </q-breadcrumbs>
