@@ -1,10 +1,11 @@
 <template>
-  <div class="col-md-4 col-sm-12 col-xs-12" id="right">
+  <div class="col-md-4 col-sm-12 col-xs-12" style="" id="right">
     <div class=" text-blue-grey-7 q-pa-md">
       <q-card class="profile bg-teal-2">
         <q-parallax
-          src="https://cdn.quasar.dev/img/parallax1.jpg"
+          src="../../public/image/tea_me.jpg"
           :height="150"
+          v-scroll
         />
         <q-card-section>
           <div class="text-h6 text-blue-5">Elliot</div>
@@ -19,7 +20,7 @@
       <q-card class="my-card bg-teal-2">
         <q-card-section class=" text-blue-grey-7">
           <div class="text-h6 text-blue-5">分类</div>
-          <div class="text-subtitle2">by John Doe</div>
+          <div class="text-subtitle2">虽千万人,吾往矣.</div>
         </q-card-section>
         <q-card-actions class="q-pa-md q-ma-lg-sm items-center">
           <q-btn dense size="md" color="red-4"> CPP</q-btn>
