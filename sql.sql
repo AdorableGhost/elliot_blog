@@ -92,3 +92,30 @@ create table comment
     created_at  date          not null             default current_timestamp,
     updated_at  date          not null             default current_timestamp
 );
+
+
+-- 页面渲染相关表 , 为了能够自定义 页面,每个用户的页面显示为不同的页面,这里嫁了
+-- 页面渲染的表, 为后期 BBS 预留借口
+create table view
+(
+    -- 一个view 字段 对应 一个页面需要存在数据库中的 页面的动态数据,主要是页面的 展室类 元素
+    -- 数据库存储之后通过 服务器后端返回给前端.
+    id         uuid         not null primary key default uuid_generate_v4(),
+    name       varchar(100) not null,
+    url        varchar(100)[],
+    element    uuid[]       not null, -- 使用的元素的 uuid ,引用自 elements 表
+    created_at date         not null             default current_timestamp,
+    updated_at date         not null             default current_timestamp
+);
+
+create table elements
+(
+    -- 一个view 字段 对应 一个页面需要存在数据库中的 页面的动态数据,主要是页面的 展室类 元素
+    -- 数据库存储之后通过 服务器后端返回给前端.
+    id         uuid         not null primary key default uuid_generate_v4(),
+    name       varchar(100) not null,
+    type       varchar(100) not null             default 'text', --  可以是 color ,class , style ,raw_html ,text,json ,image等,统一使用字符串存储
+    model      varchar(100) not null,                            -- model 对应 vue 中的 model,页面初始化完成之后这个值会被 直接赋予 前端model
+    created_at date         not null             default current_timestamp,
+    updated_at date         not null             default current_timestamp
+);
