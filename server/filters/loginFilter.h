@@ -13,6 +13,9 @@
 #include <iostream>
 #include <map>
 #include <json/json.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#include <openssl/evp.h>
 
 using namespace drogon::orm;
 using namespace drogon;
@@ -25,10 +28,16 @@ private:
     bool is_valid = false;
     unsigned char uuid[100];
     char uuid_str[200];
+    const int g_nBits = 1024;
 
 
 public:
-    loginFilter() {}
+    loginFilter() {};
+
+    static map<string, string> *mkRsaKey(int g_nBits);
+
+    static string &getPassWord(string input_rsa_s, string input_rsa_private);
+
 
     virtual void doFilter(const HttpRequestPtr &req,
                           FilterCallback &&fcb,
