@@ -34,7 +34,7 @@ private:
 public:
     loginFilter() {};
 
-    static map<string, string> *mkRsaKey(int g_nBits);
+
 
     static string &getPassWord(string input_rsa_s, string input_rsa_private);
 
