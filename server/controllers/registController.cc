@@ -1,5 +1,5 @@
 #include "registController.h"
-#include
+
 
 void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
                                               std::function<void(const HttpResponsePtr &)> &&callback) {
@@ -20,18 +20,49 @@ void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
 
     if (req_1.empty() || params->empty() || !(*params)["name"].isString() ||
         !(*params)["password"].isString() || !(*params)["email"].isString() || !(*params)["phone"].isString()
-        || !(*params)["language"].isString()) {
+        || !(*params)["language"].isString() || !(*params)["avatar"].isString()) {
         cout << "here is ok 1" << endl;
         error["message"] = "参数不对!,缺少必要参数.";
         auto resp = HttpResponse::newHttpJsonResponse(error);
-        fcb(resp);
+        callback(resp);
     }
 
     // 参数检查完成,可以进行注册动作.
     // 首先生成 RSA 密匙和公匙,
-    // 然后判断 是否提交了头像,如果没有提交,那么生成默认的头像
 
     auto rsa_key = this->mkRsaKey(1024);
+    auto res = db->execSqlAsyncFuture(
+            "insert into users(name,email,phone,password,rsa_private,rsa_public) values($name,$email,$phone,$password,$rsa_private,$rsa_public)",
+            (*params)["name"].asString(), (*params)["phone"].asString(), (*params)["password"].asString(),
+            rsa_key->find("private")->first, rsa_key->find("public")->first);
+
+    try {
+        auto result = res.get();
+        cout << "" << result.size() << endl;
+        if (result.size() < 1) {
+            error["message"] = "找不到用户!";
+            auto res = drogon::HttpResponse::newHttpJsonResponse(error);
+            res->setStatusCode(k404NotFound);
+            callback(res);
+        } else {
+            std::cout << "增加用户成功!" << std::endl;
+            error["code"] = 200;
+            error["message"] = "OK";
+
+            auto res = drogon::HttpResponse::newHttpJsonResponse(error);
+            res->setStatusCode(k200OK);
+            callback(res);
+
+        }
+    } catch (DrogonDbException exception) {
+
+
+        error["message"] = "数据库链接错误" + (string) exception.base().what();
+        auto res = drogon::HttpResponse::newHttpJsonResponse(error);
+        res->setStatusCode(k500InternalServerError);
+        callback(res);
+    }
+
 
 
 
@@ -39,10 +70,10 @@ void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
     // 如果插入成功,设置Token 并且Token 入库,返回Token,跳转到后台中心 (前端动作)
 }
 
-inline map <string, string> *registController::mkRsaKey(int g_nBits) {
+inline map<string, string> *registController::mkRsaKey(int g_nBits) {
     // 自动生成 RSA 密匙,返回为 map <string,string> 的容器
     RSA *pRsa = RSA_generate_key(g_nBits, RSA_F4, nullptr, nullptr);
-    auto mp = make_shared < map < string, string>>();
+    auto mp = make_shared<map<string, string>>();
     string result = "";
     while (pRsa == NULL) {
         cout << "Generate RSA Key Error" << endl;

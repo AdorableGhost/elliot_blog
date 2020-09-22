@@ -11,16 +11,18 @@
 
 
 using namespace drogon;
+using namespace drogon::orm;
+using namespace std;
 
 class registController : public drogon::HttpSimpleController<registController> {
 public:
     virtual void
     asyncHandleHttpRequest(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) override;
 
-    static map <string, string> *mkRsaKey(int g_nBits);
+    map<string, string> *mkRsaKey(int g_nBits);
 
     PATH_LIST_BEGIN
-    //list path definitions here;
-    //PATH_ADD("/path","filter1","filter2",HttpMethod1,HttpMethod2...);
+        //list path definitions here;
+        PATH_ADD("/register", Post);
     PATH_LIST_END
 };
