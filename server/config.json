@@ -7,45 +7,46 @@
       "cert": "../../trantor/trantor/tests/server.pem",
       "key": "../../trantor/trantor/tests/server.pem"
   },
+  */
   "listeners": [
-      {
-          //address: Ip address,0.0.0.0 by default
-          "address": "127.0.0.1",
-          //port: Port number
-          "port": 80,
-          //https: If true, use https for security,false by default
-          "https": false
-      }
+    {
+      //address: Ip address,0.0.0.0 by default
+      "address": "0.0.0.0",
+      //port: Port number
+      "port": 1995,
+      //https: If true, use https for security,false by default
+      "https": false
+    }
   ],
   "db_clients": [
-      {
-          //name: Name of the client,'default' by default
-          //"name":"",
-          //rdbms: Server type, postgresql,mysql or sqlite3, "postgresql" by default
-          "rdbms": "postgresql",
-          //filename: Sqlite3 db file name
-          //"filename":"",
-          //host: Server address,localhost by default
-          "host": "127.0.0.1",
-          //port: Server port, 5432 by default
-          "port": 5432,
-          //dbname: Database name
-          "dbname": "postgres",
-          //user: 'postgres' by default
-          "user": "postgres",
-          //passwd: '' by default
-          "passwd": "49da970afdc",
-          //is_fast: false by default, if it is true, the client is faster but user can't call
-          //any synchronous interface of it.
-          "is_fast": false,
-          //client_encoding: The character set used by the client. it is empty string by default which
-          //means use the default character set.
-          //"client_encoding": "",
-          //connection_number: 1 by default, if the 'is_fast' is true, the number is the number of
-          //connections per IO thread, otherwise it is the total number of all connections.
-          "connection_number": 1
-      }
-  ],*/
+    {
+      //name: Name of the client,'default' by default
+      "name": "blog",
+      //rdbms: Server type, postgresql,mysql or sqlite3, "postgresql" by default
+      "rdbms": "postgresql",
+      //filename: Sqlite3 db file name
+      //"filename":"",
+      //host: Server address,localhost by default
+      "host": "127.0.0.1",
+      //port: Server port, 5432 by default
+      "port": 5432,
+      //dbname: Database name
+      "dbname": "postgres",
+      //user: 'postgres' by default
+      "user": "postgres",
+      //passwd: '' by default
+      "passwd": "49da970afdc",
+      //is_fast: false by default, if it is true, the client is faster but user can't call
+      //any synchronous interface of it.
+      "is_fast": false,
+      //client_encoding: The character set used by the client. it is empty string by default which
+      //means use the default character set.
+      //"client_encoding": "",
+      //connection_number: 1 by default, if the 'is_fast' is true, the number is the number of
+      //connections per IO thread, otherwise it is the total number of all connections.
+      "connection_number": 1
+    }
+  ],
   "app": {
     //threads_num: The number of IO threads, 1 by default, if the value is set to 0, the number of threads
     //is the number of CPU cores
@@ -143,7 +144,7 @@
       "log_size_limit": 100000000,
       //log_level: "DEBUG" by default,options:"TRACE","DEBUG","INFO","WARN"
       //The TRACE level is only valid when built in DEBUG mode.
-      "log_level": "DEBUG"
+      "log_level": "INFO"
     },
     //run_as_daemon: False by default
     "run_as_daemon": false,

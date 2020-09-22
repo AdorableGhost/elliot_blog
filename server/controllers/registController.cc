@@ -29,25 +29,36 @@ void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
 
     // 参数检查完成,可以进行注册动作.
     // 首先生成 RSA 密匙和公匙,
-
     auto rsa_key = this->mkRsaKey(1024);
+
+    cout << "before insert " << endl;
+    cout << " rsa_key  private" << rsa_key->find("private")->second << endl;
+    cout << " rsa_key  public " << rsa_key->find("public")->second << endl;
+
+    string rsa_pri = rsa_key->find("private")->second;
+    string rsa_pub = rsa_key->find("public")->second;
+
+
     auto res = db->execSqlAsyncFuture(
-            "insert into users(name,email,phone,password,rsa_private,rsa_public) values($name,$email,$phone,$password,$rsa_private,$rsa_public)",
-            (*params)["name"].asString(), (*params)["phone"].asString(), (*params)["password"].asString(),
-            rsa_key->find("private")->first, rsa_key->find("public")->first);
+            "insert into users(name,email,phone,password,rsa_private,rsa_public) values($1,$2,$3,$4,$5,$6)",
+            (*params)["name"].asString(), (*params)["email"].asString(), (*params)["phone"].asString(),
+            (*params)["password"].asString(),
+            rsa_pri, rsa_pub);
 
     try {
         auto result = res.get();
         cout << "" << result.size() << endl;
         if (result.size() < 1) {
-            error["message"] = "找不到用户!";
+            error["message"] = "未成功!!";
             auto res = drogon::HttpResponse::newHttpJsonResponse(error);
-            res->setStatusCode(k404NotFound);
+            res->setStatusCode(k500InternalServerError);
             callback(res);
         } else {
             std::cout << "增加用户成功!" << std::endl;
             error["code"] = 200;
             error["message"] = "OK";
+
+            // 如果插入成功,设置Token 并且Token 入库,返回Token,跳转到后台中心 (前端动作)
 
             auto res = drogon::HttpResponse::newHttpJsonResponse(error);
             res->setStatusCode(k200OK);
@@ -64,10 +75,6 @@ void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
     }
 
 
-
-
-
-    // 如果插入成功,设置Token 并且Token 入库,返回Token,跳转到后台中心 (前端动作)
 }
 
 inline map<string, string> *registController::mkRsaKey(int g_nBits) {
