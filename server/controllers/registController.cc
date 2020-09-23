@@ -1,5 +1,6 @@
 #include "registController.h"
 
+shared_ptr<map<string, string>> mkRsaKey(int g_nBits);
 
 void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
                                               std::function<void(const HttpResponsePtr &)> &&callback) {
@@ -29,14 +30,14 @@ void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
 
     // 参数检查完成,可以进行注册动作.
     // 首先生成 RSA 密匙和公匙,
-    auto rsa_key = this->mkRsaKey(1024);
+    auto rsa_key = mkRsaKey(1024);
 
-    cout << "before insert " << endl;
-    cout << " rsa_key  private" << rsa_key->find("private")->second << endl;
-    cout << " rsa_key  public " << rsa_key->find("public")->second << endl;
+//    cout << "before insert " << endl;
+//    cout << " rsa_key  private" << rsa_key.get()->find("private")->second << endl;
+//    cout << " rsa_key  public " << rsa_key.get()->find("public")->second << endl;
 
-    string rsa_pri = rsa_key->find("private")->second;
-    string rsa_pub = rsa_key->find("public")->second;
+    string rsa_pri = rsa_key.get()->find("private")->second;
+    string rsa_pub = rsa_key.get()->find("public")->second;
 
 
     auto res = db->execSqlAsyncFuture(
@@ -48,7 +49,7 @@ void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
     try {
         auto result = res.get();
         cout << "" << result.size() << endl;
-        if (result.size() < 1) {
+        if (result.affectedRows() < 1) {
             error["message"] = "未成功!!";
             auto res = drogon::HttpResponse::newHttpJsonResponse(error);
             res->setStatusCode(k500InternalServerError);
@@ -65,7 +66,7 @@ void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
             callback(res);
 
         }
-    } catch (DrogonDbException exception) {
+    } catch (const DrogonDbException exception) {
 
 
         error["message"] = "数据库链接错误" + (string) exception.base().what();
@@ -77,14 +78,16 @@ void registController::asyncHandleHttpRequest(const HttpRequestPtr &req,
 
 }
 
-inline map<string, string> *registController::mkRsaKey(int g_nBits) {
+//namespace drogon;
+
+shared_ptr<map<string, string>> mkRsaKey(int g_nBits) {
     // 自动生成 RSA 密匙,返回为 map <string,string> 的容器
     RSA *pRsa = RSA_generate_key(g_nBits, RSA_F4, nullptr, nullptr);
     auto mp = make_shared<map<string, string>>();
     string result = "";
     while (pRsa == NULL) {
         cout << "Generate RSA Key Error" << endl;
-        return mp.get();
+        return mp;
     }
 
     //
@@ -96,15 +99,24 @@ inline map<string, string> *registController::mkRsaKey(int g_nBits) {
     int privateKeyLen = BIO_pending(privateBIO);
 
     // create char reference of private key length
-    string privateString;
+    auto privateString = make_shared<string>();
     char *privateKeyChar = (char *) malloc(privateKeyLen);
     // read the key from the buffer and put it in the char reference
     BIO_read(privateBIO, privateKeyChar, privateKeyLen);
-    privateString.append(privateKeyChar);
+    privateKeyChar[privateKeyLen] = '\0';
+    privateString->append(privateKeyChar);
 
-    mp->insert_or_assign("private", privateString);
+    mp->insert_or_assign("private", privateString->data());
     // 释放内存地址
-
+//    cout << "in Function" << endl;
+//    cout << privateKeyChar << endl;
+//    cout << "------0-------" << endl;
+//    cout << privateKeyChar[privateKeyLen] << endl;
+//    cout << "-------1-------" << endl;
+//    cout << privateKeyChar[privateKeyLen - 1] << endl;
+//    cout << "--------2------" << endl;
+//    cout << privateKeyChar[privateKeyLen - 2] << endl;
+//    cout << " end in Function" << endl;
     // at this point we can save the private key somewhere
 
     // 生成成功 私匙.
@@ -123,14 +135,14 @@ inline map<string, string> *registController::mkRsaKey(int g_nBits) {
     BIO_read(publicBIO, publicKeyChar, publicKeyLen);
     // at this point we can save the public somewhere
 
-    string publicString;
-    publicString.append(publicKeyChar);
-    mp->insert_or_assign("public", publicString);
+    auto publicString = make_shared<string>();
+    publicString->append(publicKeyChar);
+    mp->insert_or_assign("public", publicString->data());
 
     RSA_free(pRsa);
     free(publicKeyChar);
     free(privateKeyChar);
     BIO_free_all(privateBIO);
     BIO_free_all(publicBIO);
-    return mp.get();
+    return mp;
 }

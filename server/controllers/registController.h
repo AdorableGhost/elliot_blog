@@ -19,7 +19,7 @@ public:
     virtual void
     asyncHandleHttpRequest(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) override;
 
-    map<string, string> *mkRsaKey(int g_nBits);
+
 
     PATH_LIST_BEGIN
         //list path definitions here;
