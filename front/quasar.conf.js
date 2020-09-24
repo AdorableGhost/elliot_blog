@@ -58,7 +58,7 @@ module.exports = configure(function (/* ctx */) {
         // rtl: false, // https://quasar.dev/options/rtl-support
         // preloadChunks: true,
         // showProgress: false,
-        // gzip: true,
+        gzip: true,
         // analyze: true,
 
         // Options below are automatically set depending on the env, set them if you want to override
@@ -80,6 +80,10 @@ module.exports = configure(function (/* ctx */) {
       framework: {
         iconSet: 'material-icons', // Quasar icon set
         lang: 'en-us', // Quasar language pack
+        plugins: [
+          'LocalStorage',
+          'SessionStorage'
+        ],
         config: {
           loadingBar: {
             color: 'secondary',

@@ -29,6 +29,7 @@
       transition-next="fade"
       swipeable
       animated
+      v-show="coursel_display"
       control-color="white"
       navigation
       padding
@@ -72,6 +73,7 @@
 
   export default defineComponent({
     name: 'index_header',
+    props: ["coursel_display"],
     data() {
       return {
         slide: 'style',
