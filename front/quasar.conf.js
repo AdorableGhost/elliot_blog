@@ -82,7 +82,8 @@ module.exports = configure(function (/* ctx */) {
         lang: 'en-us', // Quasar language pack
         plugins: [
           'LocalStorage',
-          'SessionStorage'
+          'SessionStorage',
+          'Dialog'
         ],
         config: {
           loadingBar: {

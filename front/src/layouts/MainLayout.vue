@@ -28,13 +28,7 @@
 
 
     },
-    mounted() {
-      console.log("mounted this.showIndex=" + this.showIndex);
-
-    },
-    beforeMount() {
-      console.log("页面是:" + this.$route.path);
-
+    created() {
       if (this.$route.path in this.$store.state.blog.except_h_f) {
         this.coursel_display = false;
         console.log(" created this.coursel_display=" + this.coursel_display);
@@ -42,6 +36,20 @@
         this.coursel_display = true;
       }
 
+    },
+    beforeRouteUpdate(to, from, next) {
+      console.log("to页面是:" + to.path);
+      console.log("from页面是:" + from.path);
+      console.log("next页面是:" + next.path);
+
+      if (to.path in this.$store.state.blog.except_h_f) {
+        this.coursel_display = false;
+        console.log(" created this.coursel_display=" + this.coursel_display);
+      } else {
+        this.coursel_display = true;
+      }
+
+      next();
     },
     data() {
       return {

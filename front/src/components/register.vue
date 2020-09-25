@@ -87,8 +87,8 @@
 
 
         <div class="col-9 q-pa-sm q-pt-lg items-end text-right">
-              <span class="q-pa-sm ">
-                <q-btn class="" color="blue-4" label="oatpp"/>
+              <span class="q-pa-sm " @click="register">
+                <q-btn class="" color="blue-4" label="注册"/>
               </span>
         </div>
 
@@ -158,7 +158,63 @@
               ;
           }
 
-        }
+        },
+        register() {
+
+          while (!(this.email_reg.test(this.reg_user.email) && this.phone_reg.test(this.reg_user.phone)
+            && this.name_reg.test(this.reg_user.name) && !this.reg_user.password.empty())) {
+            // 有值不对
+            this.$q.dialog("参数不对,请检查!");
+            return;
+          }
+          // 使用 axios 创建并且 发送注册信息,看是否成功,成功就跳转,不成功就显示错误.
+          this.$axios.post("register", this.reg_user).then((res) => {
+              if (res.data.code == 200) {
+// 这册成功了
+                this.$q.dialog("注册成功!");
+                setInterval(function (this) {
+                  this.$route().push('index');
+                }, 2000);
+
+              }
+            }
+          ).catch((error) => {
+            if (error.response) {
+              // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+              this.$q.alert("注册失败!错误信息" + error.response.data);
+              console.log(error.response.data);
+              console.log(error.response.status);
+              console.log(error.response.headers);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              this.$q.alert("注册失败!错误信息" + error.message);
+              console.log('Error', error.message);
+            }
+            console.log(error.config);
+          });
+        },
+        showLoading() {
+          /* This is for Codepen (using UMD) to work */
+          const spinner = typeof QSpinnerFacebook !== 'undefined'
+            ? QSpinnerFacebook // Non-UMD, imported above
+            : Quasar.components.QSpinnerFacebook // eslint-disable-line
+          /* End of Codepen workaround */
+
+          this.$q.loading.show({
+            spinner,
+            spinnerColor: 'yellow',
+            spinnerSize: 140,
+            backgroundColor: 'purple',
+            message: '正在注册,请稍等...',
+            messageColor: 'black'
+          })
+
+          // hiding in 3s
+          this.timer = setTimeout(() => {
+            this.$q.loading.hide()
+            this.timer = void 0
+          }, 3000)
+        },
       },
     mounted() {
 
