@@ -40,7 +40,7 @@
     beforeRouteUpdate(to, from, next) {
       console.log("to页面是:" + to.path);
       console.log("from页面是:" + from.path);
-      console.log("next页面是:" + next.path);
+      // console.log("next页面是:" + next.path);
 
       if (to.path in this.$store.state.blog.except_h_f) {
         this.coursel_display = false;

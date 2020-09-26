@@ -16,7 +16,7 @@
           <q-input color="purple-12" class="col-md-8 col-sm-12 col-xs-12 col-lg-6" v-model="reg_user.name"
                    style="margin: auto;"
                    label="帐号名称"
-                   :rules="[val=>this.name_reg.test(val)||'姓名不能为空']">
+                   :rules="[val=>this.isNotEmpty(val)||'账号不能为空']">
             <template v-slot:prepend>
               <q-icon name="eva-person"/>
             </template>
@@ -70,7 +70,7 @@
               <q-icon name="eva-phone"/>
             </template>
             <template v-slot:hint style="color: blue ">
-              {{hint}}
+              {{ hint }}
             </template>
           </q-input>
 
@@ -78,7 +78,7 @@
         </q-card-section>
 
         <q-card-section class="row">
-          <q-select v-model="reg_user.language" color="purple-12" class="col-md-8 col-sm-12 col-xs-12 col-lg-6"
+          <q-select v-model="lan" color="purple-12" class="col-md-8 col-sm-12 col-xs-12 col-lg-6"
                     :options="lan_op"
                     style="margin: auto" label="请选择语言"/>
 
@@ -104,120 +104,130 @@
 </template>
 
 <script lang="ts">
-  import {defineComponent} from '@vue/composition-api';
+import {defineComponent} from '@vue/composition-api';
+import {QSpinnerFacebook} from 'quasar';
 
-  export default defineComponent({
-    name: 'header',
-    data() {
-      return {
-        slide: 'style',
-        current: 6,
-        isPwd: true,
-        hint: "",
-        reg_user: {
-          name: "",
-          password: "",
-          email: "",
-          phone: "",
-          language: "",
-          avatar: "eva-name",
+
+export default defineComponent({
+  name: 'header',
+  data() {
+    return {
+      slide: 'style',
+      current: 6,
+      isPwd: true,
+      hint: "",
+      reg_user: {
+        name: "",
+        password: "",
+        email: "",
+        phone: "",
+        language: "1",
+        avatar: "eva-name",
+      },
+      lan: {
+        label: '简体中文',
+        value: '1',
+        description: '简体中文',
+        category: '1'
+      },
+      email_reg: /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/,
+      name_reg: /[a-zA-Z+]|[0-9+]/,
+      phone_reg: /^1[3456789]\d{9}$/,
+      lan_op: [
+        {
+          label: '简体中文',
+          value: '1',
+          description: '简体中文',
+          category: '1'
         },
-        email_reg: /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/,
-        name_reg: /[a-zA-Z+]|[0-9+]/,
-        phone_reg: /^1[3456789]\d{9}$/,
-        lan_op: [
-          {
-            label: '简体中文',
-            value: '1',
-            description: '简体中文',
-            category: '1'
-          },
-          {
-            label: 'English',
-            value: '2',
-            description: 'English',
-            category: '1'
-          },
-        ]
+        {
+          label: 'English',
+          value: '2',
+          description: 'English',
+          category: '1'
+        },
+      ]
+    }
+  },
+  computed: {
+    lan_1() {
+      this.reg_user.language = this.lan.value;
+    }
+  },
+  methods:
+    {
+      reset_v() {
+        this.$refs.input.resetValidation();
+      },
+      valid_email() {
+        let reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+        if (reg.test(this.email)) {
+          return true
+            ;
+        } else {
+          return false
+            ;
+        }
 
+      },
+      isNotEmpty(string) {
+        if (string == undefined || string == '' || string == null) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+      ,
+      register() {
 
+        while (!(this.email_reg.test(this.reg_user.email) && this.phone_reg.test(this.reg_user.phone)
+          && this.isNotEmpty(this.reg_user.name) && this.isNotEmpty(this.reg_user.password)
+        )) {
+          // 有值不对
+          this.showError('请填写正确的值', 'red-4');
+          return;
+        }
+// 使用 axios 创建并且 发送注册信息,看是否成功,成功就跳转,不成功就显示错误.
+        this.$axios.post("register", this.reg_user).then((res) => {
+            if (res.data.code == 200) {
+// 这册成功了
+              this.showError('注册成功！', 'blue3');
+              setInterval(() => {
+                this.$router.push('index');
+              }, 2000);
+
+            }
+          }
+        ).catch((error) => {
+          if (error.response) {
+            // 请求已发出，但服务器响应的状态码不在 2xx 范围内
+            // this.$q.alert("注册失败!错误信息" + error.response.data);
+            this.showError("注册失败!错误信息" + error.message, 'red-3');
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            // this.$q.alert("注册失败!错误信息" + error.message);
+            this.showError("注册失败!错误信息" + error.message, "red-3");
+            console.log('Error', error.message);
+          }
+          console.log(error.config);
+        });
+      },
+      showError(message, color) {
+        this.$q.notify({
+          message: message ? message : 'Error',
+          color: color ? color : "red-3",
+          multiLine: true,
+          position: "top",
+          timeout: Math.random() * 5000 + 3000,
+        })
       }
     },
-    methods:
-      {
-        reset_v() {
-          this.$refs.input.resetValidation();
-        },
-        valid_email() {
-          let reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
-          if (reg.test(this.email)) {
-            return true
-              ;
-          } else {
-            return false
-              ;
-          }
+  mounted() {
 
-        },
-        register() {
-
-          while (!(this.email_reg.test(this.reg_user.email) && this.phone_reg.test(this.reg_user.phone)
-            && this.name_reg.test(this.reg_user.name) && !this.reg_user.password.empty())) {
-            // 有值不对
-            this.$q.dialog("参数不对,请检查!");
-            return;
-          }
-          // 使用 axios 创建并且 发送注册信息,看是否成功,成功就跳转,不成功就显示错误.
-          this.$axios.post("register", this.reg_user).then((res) => {
-              if (res.data.code == 200) {
-// 这册成功了
-                this.$q.dialog("注册成功!");
-                setInterval(function (this) {
-                  this.$route().push('index');
-                }, 2000);
-
-              }
-            }
-          ).catch((error) => {
-            if (error.response) {
-              // 请求已发出，但服务器响应的状态码不在 2xx 范围内
-              this.$q.alert("注册失败!错误信息" + error.response.data);
-              console.log(error.response.data);
-              console.log(error.response.status);
-              console.log(error.response.headers);
-            } else {
-              // Something happened in setting up the request that triggered an Error
-              this.$q.alert("注册失败!错误信息" + error.message);
-              console.log('Error', error.message);
-            }
-            console.log(error.config);
-          });
-        },
-        showLoading() {
-          /* This is for Codepen (using UMD) to work */
-          const spinner = typeof QSpinnerFacebook !== 'undefined'
-            ? QSpinnerFacebook // Non-UMD, imported above
-            : Quasar.components.QSpinnerFacebook // eslint-disable-line
-          /* End of Codepen workaround */
-
-          this.$q.loading.show({
-            spinner,
-            spinnerColor: 'yellow',
-            spinnerSize: 140,
-            backgroundColor: 'purple',
-            message: '正在注册,请稍等...',
-            messageColor: 'black'
-          })
-
-          // hiding in 3s
-          this.timer = setTimeout(() => {
-            this.$q.loading.hide()
-            this.timer = void 0
-          }, 3000)
-        },
-      },
-    mounted() {
-
-    }
-  });
+  }
+})
+;
 </script>

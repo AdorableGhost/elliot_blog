@@ -26,7 +26,7 @@ create table users
     rsa_public text not null,
     created_at date not null default current_timestamp,
     updated_at date not null default current_timestamp,
-    avatar bytea
+    avatar text
 );
 
 
